@@ -48,7 +48,8 @@ def scalarmult(P,e):
 
 def encodeint(y):
   bits = [(y >> i) & 1 for i in range(b)]
-  return ''.join([chr(sum([bits[i * 8 + j] << j for j in range(8)])) for i in range(b/8)])
+  return ''.join(
+      [chr(sum(bits[i * 8 + j] << j for j in range(8))) for i in range(b / 8)])
   
 def encodeinthex(y):
   encoded = encodeint(y)
@@ -58,7 +59,8 @@ def encodepoint(P):
   x = P[0]
   y = P[1]
   bits = [(y >> i) & 1 for i in range(b - 1)] + [x & 1]
-  return ''.join([chr(sum([bits[i * 8 + j] << j for j in range(8)])) for i in range(b/8)])
+  return ''.join(
+      [chr(sum(bits[i * 8 + j] << j for j in range(8))) for i in range(b / 8)])
   
 def encodepointhex(P):
   encoded = encodepoint(P)
@@ -91,14 +93,14 @@ def isoncurve(P):
   return (-x*x + y*y - 1 - d*x*x*y*y) % q == 0
 
 def decodeint(s):
-  return sum(2**i * bit(s,i) for i in range(0,b))
+  return sum(2**i * bit(s,i) for i in range(b))
   
 def decodeinthex(sH):
   s = sH.decode("hex")
   print decodeint(s)
 
 def decodepoint(s):
-  y = sum(2**i * bit(s,i) for i in range(0,b-1))
+  y = sum(2**i * bit(s,i) for i in range(b-1))
   x = xrecover(y)
   if x & 1 != bit(s,b-1): x = q-x
   P = [x,y]
@@ -113,7 +115,7 @@ def decodepointhex(sH):
 def checkvalid(s,m,pk):
   if len(s) != b/4: raise Exception("signature length is wrong")
   if len(pk) != b/8: raise Exception("public-key length is wrong")
-  R = decodepoint(s[0:b/8])
+  R = decodepoint(s[:b/8])
   A = decodepoint(pk)
   S = decodeint(s[b/8:b/4])
   h = Hint(encodepoint(R) + pk + m)
